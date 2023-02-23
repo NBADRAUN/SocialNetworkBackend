@@ -3,20 +3,21 @@ const db = require('../../config/connection'); // creates the connection with Mo
 const router = express.Router(); 
 const mongoose = require('mongoose'); 
 const { ObjectId } = require('mongodb');
-const User = require('../../models/User');
+const Thought = require('../../models/Thought');
+
 
 
 
 
 //// test route////
-router.get('/test-user', (req, res) => {
+router.get('/test', (req, res) => {
     res.send('This is the test user route'); 
 }); 
 
 
 //// get all Users using Mongoose find filter //// 
 router.get('/', (req, res) => {
-  User.find({}, (err, result) => {
+  Thought.find({}, (err, result) => {
     if (result) {
       res.status(200).json(result);
     } else {
@@ -28,7 +29,7 @@ router.get('/', (req, res) => {
 
 //// find one user using Mongoose find filter (by ID) //// 
 router.get('/:id', (req, res) => {
-  User.find({_id:ObjectId(req.params.id)}, (err, result) => {
+  Thought.find({_id:ObjectId(req.params.id)}, (err, result) => {
     if (result) {
       res.status(200).json(result);
     } else {
@@ -41,15 +42,13 @@ router.get('/:id', (req, res) => {
 
 /// post new user using Mongoose model //// 
 router.post('/', (req, res) => {
-  const newUser = new User(
+  const newThought = new Thought(
     { 
-      username: req.body.username,
-      email: req.body.email, 
-      thoughts: [], 
+      thoughtText: req.body.thought,
     }); 
-    newUser.save(); 
-    if (newUser) {
-      res.status(200).json(newUser);
+    newThought.save(); 
+    if (newThought) {
+      res.status(200).json(newThought);
     } else {
       console.log('ServerError');
       res.status(500).json({ message: 'ServerError' });
@@ -60,7 +59,7 @@ router.post('/', (req, res) => {
 
 /// update user using Mongoose by findoneandupdate route by finding ID //// 
 router.post('/update/:id', (req, res) => {
-  User.findOneAndUpdate(
+  Thought.findOneAndUpdate(
     {_id:ObjectId(req.params.id)},
     { username: req.body.username,
       email: req.body.email, 
@@ -80,7 +79,7 @@ router.post('/update/:id', (req, res) => {
   
 /// delete user using Mongoose models by findoneanddelete using ID /// 
 router.delete('/:id', (req, res) => {
-  User.findOneAndDelete({_id:ObjectId(req.params.id)}, (err, result) => {
+  Thought.findOneAndDelete({_id:ObjectId(req.params.id)}, (err, result) => {
     if (result) {
       res.status(200).json(result);
       // console.log(`Deleted: ${result}`);  /// this would console.log what happened can be used in any CRUD /// 
