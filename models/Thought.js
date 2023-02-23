@@ -1,9 +1,10 @@
 const mongoose = require('mongoose'); 
-
+const User = require('../models/User'); 
+const { Schema, model } = require('mongoose');
 
 
 /// model schema for the user ///
-const thoughtSchema = new mongoose.Schema({
+const thoughtSchema = new Schema({
     thoughtText:{
         type: String, 
         required: true, 
@@ -12,13 +13,11 @@ const thoughtSchema = new mongoose.Schema({
     createdAt: {
         type: Date, 
         default: Date.now},
-    // username: userSchema,  
-    // reactions: [reactionSchema], 
     }); 
     
 
 /// use mongoose.model() to create the model ///
-const  Thought = mongoose.model('Thought',thoughtSchema); 
+const Thought = model('Thought',thoughtSchema); 
 
 
 module.exports = Thought; 
