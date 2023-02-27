@@ -4,17 +4,10 @@ const router = express.Router();
 const mongoose = require('mongoose'); 
 const { ObjectId } = require('mongodb');
 const User = require('../../models/User');
+const Thought = require('../../models/Thought');
 
 
-
-
-//// test route////
-router.get('/test-user', (req, res) => {
-    res.send('This is the test user route'); 
-}); 
-
-
-//// get all Users using Mongoose find filter //// 
+//// get all Users using Mongoose //// 
 router.get('/', (req, res) => {
   User.find({}, (err, result) => {
     if (result) {
@@ -26,7 +19,9 @@ router.get('/', (req, res) => {
   });
 });
 
-//// find one user using Mongoose find filter (by ID) //// 
+
+
+//// find one user using Mongoose find filter (by _id) //// 
 router.get('/:id', (req, res) => {
   User.find({_id:ObjectId(req.params.id)}, (err, result) => {
     if (result) {
@@ -38,14 +33,12 @@ router.get('/:id', (req, res) => {
   });
 });
 
-
 /// post new user using Mongoose model //// 
 router.post('/', (req, res) => {
   const newUser = new User(
     { 
       username: req.body.username,
-      email: req.body.email, 
-      thoughts: [], 
+      email: req.body.email,     
     }); 
     newUser.save(); 
     if (newUser) {
@@ -57,12 +50,12 @@ router.post('/', (req, res) => {
   }); 
 
 
-
-/// update user using Mongoose by findoneandupdate route by finding ID //// 
+/// update user using Mongoose by findoneandupdate route by finding _id //// 
 router.post('/update/:id', (req, res) => {
   User.findOneAndUpdate(
     {_id:ObjectId(req.params.id)},
-    { username: req.body.username,
+    { 
+      username: req.body.username,
       email: req.body.email, 
     },
     { new: true },
@@ -77,8 +70,9 @@ router.post('/update/:id', (req, res) => {
   );
 });
 
+
   
-/// delete user using Mongoose models by findoneanddelete using ID /// 
+/// delete user using Mongoose models by findoneanddelete using _id  /// 
 router.delete('/:id', (req, res) => {
   User.findOneAndDelete({_id:ObjectId(req.params.id)}, (err, result) => {
     if (result) {

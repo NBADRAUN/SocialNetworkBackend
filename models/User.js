@@ -1,6 +1,4 @@
-const mongoose = require('mongoose'); 
-const { Schema, model } = require('mongoose');
-
+const { Schema, model } = require ('mongoose'); 
 
 /// model schema for the user ///
 const userSchema = new Schema({
@@ -13,17 +11,21 @@ const userSchema = new Schema({
         required: true, 
         unique: true, 
         match:/.+\@.+\..+/},
-    thoughts: [
-        {
-          type: Schema.Types.ObjectId,
-          ref: 'Thought',
-        },
-      ],
-    // friends: [friendsSchema],
-}); 
+
+    thoughts:[{ type: Schema.Types.ObjectId, ref: 'thought'}],
+
+},
+{
+    toJSON: { 
+        virtuals: true,
+    },
+    id: false,
+},
+
+); 
 
 /// use mongoose.model() to create the model ///
-const  User = model('User',userSchema); 
+const User = model('user',userSchema); 
 
 
 module.exports = User; 

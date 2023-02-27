@@ -4,15 +4,7 @@ const router = express.Router();
 const mongoose = require('mongoose'); 
 const { ObjectId } = require('mongodb');
 const Thought = require('../../models/Thought');
-
-
-
-
-
-//// test route////
-router.get('/test', (req, res) => {
-    res.send('This is the test user route'); 
-}); 
+const User = require('../../models/User'); 
 
 
 //// get all Users using Mongoose find filter //// 
@@ -40,20 +32,28 @@ router.get('/:id', (req, res) => {
 });
 
 
-/// post new user using Mongoose model //// 
+//////////////////// Post new thought and add to user model using _id  ////////////////////
 router.post('/', (req, res) => {
-  const newThought = new Thought(
-    { 
-      thoughtText: req.body.thought,
-    }); 
-    newThought.save(); 
-    if (newThought) {
-      res.status(200).json(newThought);
-    } else {
-      console.log('ServerError');
-      res.status(500).json({ message: 'ServerError' });
-    }
-  }); 
+  Thought.create(req.body)
+    .then((post) => {
+      return User.findOneAndUpdate(
+        { _id: req.body.userID },
+        { $addToSet: { thoughts: post._id,} },
+        { new: true }
+      );
+    })
+    .then((user) =>
+      !user
+        ? res
+            .status(404)
+            .json({ message: 'thought created but userID not found' })
+        : res.json('userID found and thought created')
+    )
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json(err);
+    });
+}),
 
 
 
@@ -61,8 +61,9 @@ router.post('/', (req, res) => {
 router.post('/update/:id', (req, res) => {
   Thought.findOneAndUpdate(
     {_id:ObjectId(req.params.id)},
-    { username: req.body.username,
-      email: req.body.email, 
+    { 
+      thoughtText: req.body.thoughtText,
+      username: req.body.username
     },
     { new: true },
     (err, result) => {
@@ -76,19 +77,17 @@ router.post('/update/:id', (req, res) => {
   );
 });
 
-  
-/// delete user using Mongoose models by findoneanddelete using ID /// 
-router.delete('/:id', (req, res) => {
-  Thought.findOneAndDelete({_id:ObjectId(req.params.id)}, (err, result) => {
-    if (result) {
-      res.status(200).json(result);
-      // console.log(`Deleted: ${result}`);  /// this would console.log what happened can be used in any CRUD /// 
-    } else {
-      console.log('ServerError!');
-      res.status(500).json({ message: 'ServerError!' });
-    }
-  });
-});
+//// delete thought and also remove from the userID using _id /////// 
+router.delete('/:id', async (req, res) => {
+  try {
+      await Thought.findByIdAndDelete(req.params.id);
+      await User.findOneAndUpdate({thoughts: req.params.id}, {$pull: {thoughts: req.params.id}}, 
+      {new: true});
+      res.status(200).json({message: 'Thought deleted and removed from user'});
+  } catch (error) {
+      res.status(400).json('Error finding ID')
+  }
+});  
 
 
 

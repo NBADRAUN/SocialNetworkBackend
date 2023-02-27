@@ -1,27 +1,21 @@
-const express = require('express'); // creates the server using express // 
+const express = require('express'); // creates the server using express /// 
 
-const routes = require('./routes');
+const routes = require('./routes');  // creates the route to the routes /// 
 
-
-const app = express(); // middleware for API functions 
-app.use(express.json()); // adds the express function to produce data as JSON // 
-app.use(express.urlencoded({ extended: true }));  // middleware to parse incoming requests 
+/// these are middleware ///// 
+const app = express(); // middleware for API  //// 
+app.use(express.json()); // express JSON to handle JSON  ////
+app.use(express.urlencoded({ extended: true }));  // middleware for object requests ///  
 
 app.use(routes);
-// app.use('/users',user); 
 
-// const data = require('./models'); 
-
-///create a server using express on port 3001///
+///create a server on port 3001 or whatever the hosting service provides ///
 const PORT = process.env.PORT || 3001;
 
 
-
-
-
-/// server opens port to use /// 
+/// server with either port 3001 or whatever the hosting service provides.  /// 
 app.listen(PORT, () => {
-console.log(`Example app listening at http://localhost:${PORT}`);
+console.log(`Server listening at http://localhost:${PORT}`);
 });
 
 
